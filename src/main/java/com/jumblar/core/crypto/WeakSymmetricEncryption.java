@@ -1,3 +1,4 @@
+// Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.crypto;
 
 import static com.jumblar.core.generators.CharacterGenerator.utf8Bytes;

@@ -1,3 +1,4 @@
+// Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.crypto;
 
 import java.util.Random;

@@ -1,3 +1,4 @@
+// Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.network;
 
 import static com.jumblar.core.encodings.Base64.decodePGPComment;
