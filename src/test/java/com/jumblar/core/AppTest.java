@@ -1,8 +1,16 @@
 package com.jumblar.core;
 
+import java.util.Arrays;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import com.jumblar.core.controllers.BaseController;
+import com.jumblar.core.crypto.WeakSymmetricEncryption;
+import com.jumblar.core.domain.HashBase;
+import com.jumblar.core.domain.SimpleJumble;
+import com.jumblar.core.encodings.Base64;
 
 /**
  * Unit test for simple App.
@@ -34,5 +42,40 @@ public class AppTest
     public void testApp()
     {
         assertTrue( true );
+    }
+    
+    public void testSymmetricEncryption() throws Exception{
+    	WeakSymmetricEncryption wse = new WeakSymmetricEncryption();
+    	String password = "password";
+    	byte[] msg = "This is a test message".getBytes("UTF-8");
+    	assertNotNull(wse.encrypt(password, msg));
+    }
+    
+    public void testBaseController() throws Exception{
+    	String username = "testing-user";
+    	String email = "testing-user@special.domain";
+    	String personalInfo = "";
+    	String password = "password";
+    	String coordinate = "48.858404,2.293571"; //Corner of eiffel tower.
+    	
+    	/** The following is for user registration. */
+    	BaseController bc = new BaseController();
+    	SimpleJumble simpleJumble = bc.createNewPGPEntry(username, email, personalInfo, password, coordinate);
+    	assertNotNull (simpleJumble);
+    	
+    	HashBase hb = bc.computeHashBase(simpleJumble.getSinglePointReference(),
+    			password, coordinate);
+    	assertTrue(Arrays.equals(simpleJumble.getHashBase().getHashBase(),
+    			hb.getHashBase()));
+    	
+    	
+    	/** The following is for retrieving a user pgp entry */
+    	String actualHashBase = "v4ikHl6Zluz7P1RGSCTS35VQuMqbYTserSI3kiC/Q5s=";
+    	String guessCoordinate = "48.858405,2.293577";
+    	SimpleJumble sj = bc.computeHashBase(username, email, personalInfo, password, guessCoordinate);
+    	String guessHashBase = (Base64.encodeBytes(sj.getHashBase().getHashBase()));
+    	
+    	assertEquals (actualHashBase, guessHashBase);
+    	
     }
 }
