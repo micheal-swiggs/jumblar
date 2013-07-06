@@ -29,3 +29,7 @@ Jumblar leverages vague-hashes and the PGP network to store Jumbles in the open.
 The benefit is that your Jumble will always* be accessible. The PGP network is a decentralized group of servers. They are self-synchronizing and controlled by different organizations in different countries. 
 
 Once a user has registered their Jumble they only require an internet connection for mapping and to contact a PGP server.
+
+<h1>Contribute</h1>
+
+Anyone is welcome to submit patches, issues and tell friends! A crypto-analysis would be great. 
