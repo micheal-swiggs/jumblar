@@ -1,7 +1,11 @@
 // Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.utils;
 
-
+/**
+ * Some functions that are not available in later versions
+ * of android.
+ *
+ */
 public class Arrays {
 
 	

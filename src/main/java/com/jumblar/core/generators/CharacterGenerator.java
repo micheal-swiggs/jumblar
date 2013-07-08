@@ -5,7 +5,13 @@ import java.io.UnsupportedEncodingException;
 
 import com.jumblar.core.crypto.CustomRandom;
 
-
+/**
+ * 
+ * @author Micheal Swiggs
+ * 
+ * Provides utility alpha-numeric functions.
+ *
+ */
 public class CharacterGenerator {
 
 	public static final int A = (int)'A';

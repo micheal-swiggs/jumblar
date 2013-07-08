@@ -16,7 +16,15 @@ import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
  * 
  * @author Micheal Swiggs
  *
- *
+ * Maybe unnecessary. Was meant to provide a way of 'obsfucating'
+ * PGP comments. PGP comments would be encrypted using non-essential
+ * personal data, e.g place-of-birth. This would make it difficult
+ * for others to see the Jumble. 
+ * 
+ * For the same username & email it may be possible to have multiple
+ * PGP entries. The order could be encoded in the comment. Which would
+ * be protected by weak-encryption. If an adversary broke the encryption
+ * they could only disrupt the order.
  */
 public class WeakSymmetricEncryption {
 	

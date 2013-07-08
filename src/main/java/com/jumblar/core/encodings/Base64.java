@@ -1,4 +1,3 @@
-// Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.encodings;
 
 import java.io.IOException;

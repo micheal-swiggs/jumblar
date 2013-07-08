@@ -1,3 +1,4 @@
+// Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.crypto;
 
 import java.security.GeneralSecurityException;
@@ -9,6 +10,12 @@ import static com.jumblar.core.crypto.Algorithms.*;
 import static com.jumblar.core.generators.CharacterGenerator.*;
 
 
+/**
+ * 
+ * @author Micheal Swiggs
+ * 
+ *
+ */
 public class SCryptDerivation {
 
 	byte[] salt;

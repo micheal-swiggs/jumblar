@@ -4,9 +4,10 @@ package com.jumblar.core.domain;
 import java.io.Serializable;
 
 /**
+ * @author Micheal Swiggs
  * Contains enough information to determine the correct
- * password and coordinates.
- * @author micheal
+ * password and coordinates without needing to contact 
+ * a PGP server.
  *
  */
 public class SinglePointReference implements Serializable{

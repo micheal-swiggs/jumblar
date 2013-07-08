@@ -1,6 +1,12 @@
 // Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.spiral;
 
+/**
+ * @author Micheal Swiggs
+ * 
+ * For spiraling around a central point. Spirals
+ * in a grid rather than a disc.
+ */
 public class SingleSpiral {
 
 	int actualX, actualY;

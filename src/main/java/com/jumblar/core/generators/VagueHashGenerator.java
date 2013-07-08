@@ -8,8 +8,18 @@ import com.jumblar.core.crypto.SCryptDerivation;
 import com.jumblar.core.encodings.Base64;
 import com.jumblar.core.utils.Arrays;
 
+/**
+ * @author Micheal Swiggs
+ *
+ * Basis of generating vague hashes. Hashing done via
+ * SCrypt.
+ * 
+ */
 public class VagueHashGenerator {
-
+	
+	/** Number of bytes used of the resulting hash for
+	 * the vague-hash.
+	 */
 	public static final int NBYTES = 2;
 	
 	SCryptDerivation hd;

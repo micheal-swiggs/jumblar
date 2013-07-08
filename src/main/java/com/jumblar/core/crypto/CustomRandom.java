@@ -6,6 +6,12 @@ import java.util.Random;
 
 import static com.jumblar.core.crypto.Algorithms.*;
 
+/**
+ * @author Micheal Swiggs
+ *
+ * Necessary for shuffling and interacting with other functions
+ * expecting Random.
+ */
 public class CustomRandom extends Random{
 	private static final long serialVersionUID = -6055461167136178306L;
 	final byte[] baseBytes;
