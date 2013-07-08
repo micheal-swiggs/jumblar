@@ -74,11 +74,8 @@ public class AppTest
     	String guessCoordinate = "48.858405,2.293577";
     	SimpleJumble sj = bc.computeHashBase(username, email, personalInfo, password, guessCoordinate);
     	String guessHashBase = (Base64.encodeBytes(sj.getHashBase().getHashBase()));
-    	println (guessHashBase);
     	assertEquals (actualHashBase, guessHashBase);    	
     }
-    
-    public static void println(Object ob){System.out.println(""+ob);}
     
     
 }

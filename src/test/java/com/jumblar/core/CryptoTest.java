@@ -18,19 +18,10 @@ public class CryptoTest
 		return new TestSuite (CryptoTest.class);
 	}
 	
-	public void testScryptUtil() throws Exception{    	
-    	println (SCryptUtil.scrypt("password", 128, 8, 1));
-    }
-	
 	public void testScrypt() throws Exception{
 		byte[] password = "password".getBytes("UTF-8");
 		byte[] salt = "salt".getBytes();
 		byte[] dKey = SCrypt.scrypt(password, salt, 128,8,1,64);
 		assertNotNull (dKey);
-		println (dKey.length);
 	}
-    
-    public static void println(Object ob){
-    	System.out.println(""+ob);
-    }
 }

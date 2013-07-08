@@ -91,7 +91,6 @@ public class BaseController {
 		yCoord = (int) (new Double (coords[1]) * 1000000);
 		SpiralScan ss = new SpiralScan (xCoord, yCoord, password, vHash, salt, N, r, p, keyLength);
 		int[] actualCoordinates = ss.attemptMatch(2000);
-		System.out.println (ss.getActualRounds());
 		if (actualCoordinates == null) return null;
 		SinglePointReference spf = new SinglePointReference(
 				salt, vHash, username, email, personalInfo, N, r, p, keyLength);
