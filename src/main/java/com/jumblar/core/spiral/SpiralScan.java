@@ -1,9 +1,10 @@
 // Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.spiral;
 
-import com.jumblar.core.utils.Arrays;
+import java.security.GeneralSecurityException;
 
-import com.jumblar.core.crypto.HashDerivation;
+import com.jumblar.core.crypto.SCryptDerivation;
+import com.jumblar.core.utils.Arrays;
 
 
 public class SpiralScan {
@@ -13,33 +14,48 @@ public class SpiralScan {
 	byte[] salt;
 	byte[] vagueHash;
 	
+	int N, r, p, keyLength;
 	SingleSpiral ss;
 	
-	public SpiralScan (int xGuess, int yGuess, String password, byte[] verifyingHash, byte[] salt){
+	int actualRounds;
+	
+	public SpiralScan (int xGuess, int yGuess, String password, byte[] verifyingHash, byte[] salt,
+			int N, int r, int p, int keyLength){
 		this.xGuess = xGuess;
 		this.yGuess = yGuess;
 		this.password = password;
 		this.vagueHash = verifyingHash;
 		ss = new SingleSpiral (xGuess, yGuess);
 		this.salt = salt;
-	}
-	
-	public static void println (Object o){
-		System.out.println (""+o);
+		this.N = N;
+		this.r = r;
+		this.p = p;
+		this.keyLength = keyLength;
 	}
 	
 	public int[] attemptMatch (int nRounds){
-		for (int i=0; i<nRounds; i++){
-			int[] nextPoint = ss.nextItem();
-			//println (nextPoint[0]+" "+nextPoint[1]);
-			HashDerivation hd = new HashDerivation (nextPoint[0], nextPoint[1], password, salt);
-			byte[] guessHash = hd.hash();
-			guessHash = Arrays.copyOfRange(guessHash, 0, vagueHash.length);
-			//assert guessHash.length == vagueHash.length;
-			if (Arrays.equals(vagueHash, guessHash)){
-				return nextPoint;
+		SCryptDerivation hd = new SCryptDerivation (0, 0, password, salt,
+				N, r, p, keyLength);
+		byte[] guessHash;
+		actualRounds=-1;
+		try{
+			for (int i=0; i<nRounds; i++){
+				int[] nextPoint = ss.nextItem();
+				guessHash = hd.hash(nextPoint[0], nextPoint[1]);
+				guessHash = Arrays.copyOfRange(guessHash, 0, vagueHash.length);
+				if (Arrays.equals(vagueHash, guessHash)){
+					actualRounds = i;
+					return nextPoint;
+				}
 			}
+		} catch (GeneralSecurityException e){
+			e.printStackTrace();
+			throw new RuntimeException (e);
 		}
 		return null;
+	}
+	
+	public int getActualRounds(){
+		return actualRounds;
 	}
 }

@@ -10,21 +10,28 @@ import java.io.Serializable;
  *
  */
 public class SinglePointReference implements Serializable{
-	private static final long serialVersionUID = -2164493180542044058L;
+	private static final long serialVersionUID = -214493180542044058L;
 	
 	byte[] salt;
 	byte[] vagueHash;
+	int N, r, p, keyLength;
 	String username;
 	String email;
 	String personalInfo;
 	
 	public SinglePointReference (byte[] salt, byte[] vHash,
-			String username, String email, String personalInfo){
+			String username, String email, String personalInfo,
+			int N, int r, int p, int keyLength){
 		this.salt = salt;
 		this.vagueHash = vHash;
 		this.username = username;
 		this.email = email;
 		this.personalInfo = personalInfo;
+		
+		this.N = N;
+		this.r = r;
+		this.p = p;
+		this.keyLength = keyLength;
 	}
 	
 	public byte[] getSalt(){
@@ -42,4 +49,9 @@ public class SinglePointReference implements Serializable{
 	public String getPersonalInfo(){
 		return personalInfo;
 	}
+	public int getN(){ return N;}
+	public int getR(){return r;}
+	public int getP(){return p;}
+	public int getKeyLength(){return keyLength;}
+	
 }

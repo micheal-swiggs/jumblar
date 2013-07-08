@@ -21,7 +21,7 @@ When signing in the user will attempt to choose a location as close as possible 
 
 If an adversary obtains the vague-hash and knows the password then the most they can achieve is knowing a set of locations that share the same vague-hash. Hence the adversary can only have a vague idea of what the location could be.
 
-Currently the vague-hash is three bytes long, it is hoped that this will become customizable.
+Currently the vague-hash is two bytes long, it is hoped that this will become customizable.
 
 <h4>Open storage & PGP network</h4>
 Jumblar leverages vague-hashes and the PGP network to store Jumbles in the open. Currently every Jumble is stored in the comment of a PGP entry. If you have a Jumble then everyone can see your username, email and vague-hash. 

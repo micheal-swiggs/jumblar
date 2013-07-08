@@ -2,29 +2,37 @@
 package com.jumblar.core.generators;
 
 import java.io.IOException;
-import com.jumblar.core.utils.Arrays;
+import java.security.GeneralSecurityException;
 
-import com.jumblar.core.crypto.HashDerivation;
+import com.jumblar.core.crypto.SCryptDerivation;
 import com.jumblar.core.encodings.Base64;
+import com.jumblar.core.utils.Arrays;
 
 public class VagueHashGenerator {
 
-	public static final int NBYTES = 3;
+	public static final int NBYTES = 2;
 	
-	HashDerivation hd;
+	SCryptDerivation hd;
 	byte[] hashArray;
 	
-	public VagueHashGenerator (int x, int y, String password, byte[] salt){
-		hd = new HashDerivation (x,y, password, salt);
-		hashArray = hd.hash();
+	public VagueHashGenerator (int x, int y, String password, byte[] salt,
+			int N, int r, int p, int keyLength){
+		hd = new SCryptDerivation (x,y, password, salt, N, r, p, keyLength);
+		try {
+			hashArray = hd.hash();
+		} catch (GeneralSecurityException e) {
+			e.printStackTrace();
+			throw new RuntimeException (e);
+		}
 	}
 	
 	public String shortenedHash(){
 		return "#64#"+Base64.encodeBytes(Arrays.copyOfRange (hashArray, 0, NBYTES));
 	}
 	
-	public static String base64VagueHash (int x, int y, String password, byte[] salt){
-		return new VagueHashGenerator (x, y, password, salt).shortenedHash();
+	public static String base64VagueHash (int x, int y, String password, byte[] salt,
+			int N, int r, int p, int keyLength){
+		return new VagueHashGenerator (x, y, password, salt, N, r, p, keyLength).shortenedHash();
 	}
 	
 	public static byte[] base64VagueHashDecode (String vHash) throws IOException{
