@@ -5,6 +5,8 @@ Jumblar is an attempt to use map locations as passwords. All of our accounts req
 Jumblar hopes to provide a pathway for increased user security. For most it is easy to remember a secret location. It could be anywhere in the world. But it is practically impossible for others to guess. By using this property of secret locations secure passwords can be generated.
 
 Try the beta <a href="https://play.google.com/store/apps/details?id=beta.com.jumblar.android.app">Android App</a>.
+Discuss <a href="https://www.facebook.com/Jumblar">Jumblar on facebook</a>.
+
 <h2>Base Concepts</h2>
 This section decribes how Jumblar converts & stores secret location information.  
 
@@ -29,6 +31,9 @@ Jumblar leverages vague-hashes and the PGP network to store Jumbles in the open.
 The benefit is that your Jumble will always* be accessible. The PGP network is a decentralized group of servers. They are self-synchronizing and controlled by different organizations in different countries. 
 
 Once a user has registered their Jumble they only require an internet connection for mapping and to contact a PGP server.
+
+<h4>Cryptographic hashing</h4>
+Jumblar uses SCrypt as the primary hash function and SHA256 as the secondary hash function. SCrypt is used for Vague Hash generation and in password generation. Jumblar recognizes the strengths of SCrypt and the additional security it will bring to users.
 
 <h1>Contribute</h1>
 
