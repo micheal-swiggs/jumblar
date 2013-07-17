@@ -4,6 +4,7 @@ Jumblar is an attempt to use map locations as passwords. All of our accounts req
 
 Jumblar hopes to provide a pathway for increased user security. For most it is easy to remember a secret location. It could be anywhere in the world. But it is practically impossible for others to guess. By using this property of secret locations secure passwords can be generated.
 
+Download the beta <a href="https://github.com/micheal-swiggs/jumblar-desktop/releases">Desktop App</a>.
 Try the beta <a href="https://play.google.com/store/apps/details?id=beta.com.jumblar.android.app">Android App</a>.
 Discuss <a href="https://www.facebook.com/Jumblar">Jumblar on facebook</a>.
 

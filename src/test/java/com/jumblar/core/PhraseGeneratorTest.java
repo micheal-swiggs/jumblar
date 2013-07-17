@@ -18,6 +18,14 @@ public class PhraseGeneratorTest extends TestCase{
 		return new TestSuite (PhraseGeneratorTest.class);
 	}
 	
+	public void testPhrases() throws Exception{
+		byte[] baseBytes = new byte[32];
+		PhraseGenerator pg = new PhraseGenerator (baseBytes);
+		for (int i=0;i<10;i++){
+			println(pg.randString(""+i, 20));
+		}
+	}
+	
 	public void testDifferentPhrases() throws Exception{
 		byte[] baseBytes = new byte[32];
 		PhraseGenerator pg = new PhraseGenerator (baseBytes);
@@ -36,5 +44,9 @@ public class PhraseGeneratorTest extends TestCase{
 		pw = pg.randString("c",5);
 		assertFalse(pwords.contains(pw));
 		pwords.add(pw);
+	}
+	
+	public void println (Object ob){
+		System.out.println (""+ob);
 	}
 }

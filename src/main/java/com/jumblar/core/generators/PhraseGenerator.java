@@ -68,7 +68,7 @@ public class PhraseGenerator {
 			buf = digester.digest (scryptHash);
 			String b = utf8String(scryptHash);
 			result += filterAlphaNumeric (b);
-		}
+		} 
 		Shuffler s = new Shuffler (scryptHash);
 		return s.shuffleString (result.substring(0, length));
 	}
