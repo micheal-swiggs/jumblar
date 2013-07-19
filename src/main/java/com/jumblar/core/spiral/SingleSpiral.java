@@ -9,6 +9,25 @@ package com.jumblar.core.spiral;
  */
 public class SingleSpiral {
 
+	private static final int pointSize =  2000;
+	private static final int[][] points = new int[pointSize][2];
+	private static boolean pointsInit = false;
+	
+	public static void println (Object ob){
+		System.out.println (""+ob);
+	}
+	public static int[][] getPoints(){
+		if (!pointsInit){
+			SingleSpiral ss = new SingleSpiral(0,0);
+			for(int i=0; i<pointSize;i++	){
+				int[] b = ss.nextItem();
+				points[i][0] = b[0];
+				points[i][1] = b[1];
+			}
+			pointsInit = true;
+		}
+		return points;
+	}
 	int actualX, actualY;
 	int x,y; 
 	boolean isHorizontal, isPositive;
