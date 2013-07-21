@@ -6,14 +6,18 @@ import java.io.Serializable;
 /**
  * @author Micheal Swiggs
  *
- * Parent container useful for serialization.
+ * Do Not Serialize To Disk.
+ *
+ * Parent container useful for serialization within android. Do
+ * not use this to serialize to disk. Only PointsReference should
+ * be serialized to disk.
  */
 public class SimpleJumble implements Serializable{
 	private static final long serialVersionUID = -3195482909656417729L;
 	HashBase hashbase;
-	SinglePointReference spf;
+	PointsReference spf;	
 	
-	public SimpleJumble (HashBase hb, SinglePointReference spf){
+	public SimpleJumble (HashBase hb, PointsReference spf){
 		this.hashbase = hb;
 		this.spf = spf;
 	}
@@ -21,7 +25,8 @@ public class SimpleJumble implements Serializable{
 	public HashBase getHashBase(){
 		return hashbase;
 	}
-	public SinglePointReference getSinglePointReference(){
+	public PointsReference getPointsReference(){
 		return spf;
 	}
+	
 }

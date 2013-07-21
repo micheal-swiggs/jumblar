@@ -10,8 +10,8 @@ import java.io.Serializable;
  * a PGP server.
  *
  */
-public class SinglePointReference implements Serializable{
-	private static final long serialVersionUID = -214493180542044058L;
+public class PointsReference implements Serializable{
+	private static final long serialVersionUID = -2144931680542044058L;
 	
 	byte[] salt;
 	byte[] vagueHash;
@@ -19,10 +19,11 @@ public class SinglePointReference implements Serializable{
 	String username;
 	String email;
 	String personalInfo;
+	int nPoints;	
 	
-	public SinglePointReference (byte[] salt, byte[] vHash,
+	public PointsReference (byte[] salt, byte[] vHash,
 			String username, String email, String personalInfo,
-			int N, int r, int p, int keyLength){
+			int N, int r, int p, int keyLength, int nPoints){
 		this.salt = salt;
 		this.vagueHash = vHash;
 		this.username = username;

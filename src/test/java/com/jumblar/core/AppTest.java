@@ -63,7 +63,7 @@ public class AppTest
     			N, r, p, keyLength);
     	assertNotNull (simpleJumble);
     	
-    	HashBase hb = bc.computeHashBase(simpleJumble.getSinglePointReference(),
+    	HashBase hb = bc.computeHashBase(simpleJumble.getPointsReference(),
     			password, coordinate);
     	assertTrue(Arrays.equals(simpleJumble.getHashBase().getHashBase(),
     			hb.getHashBase()));

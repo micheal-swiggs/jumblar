@@ -61,10 +61,6 @@ public class DoubleSpiral {
 		}
 	}
 	
-	public static void println(Object ob){
-		System.out.println(""+ob);
-	}
-	
 	public static int[][] getPoints(){
 		int[][] result = new int[10][2];
 		for (int i=0;i< result.length; i++){
@@ -86,13 +82,5 @@ public class DoubleSpiral {
 		}
 	}
 	
-	public static void println(int[][] item){
-		if(item == null){
-			println("null");
-			return;
-		}
-		String b = item[0][0]+","+item[0][1]+"  "+item[1][0]+","+item[1][1];
-		println (b);
-	}
 	**/
 }

@@ -13,9 +13,6 @@ public class SingleSpiral {
 	private static final int[][] points = new int[pointSize][2];
 	private static boolean pointsInit = false;
 	
-	public static void println (Object ob){
-		System.out.println (""+ob);
-	}
 	public static int[][] getPoints(){
 		if (!pointsInit){
 			SingleSpiral ss = new SingleSpiral(0,0);
