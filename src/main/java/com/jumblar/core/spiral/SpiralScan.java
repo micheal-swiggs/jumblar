@@ -9,6 +9,17 @@ import com.jumblar.core.utils.Arrays;
 
 public class SpiralScan {
 
+	private static final int[] NONE1 = new int[4];
+	protected static final int[][] NONE2 = new int[4][4];
+	
+	public static boolean isNone(int[] i){
+		return i == NONE1;
+	}
+	
+	public static boolean isNone(int[][] i){
+		return i== NONE2;
+	}
+	
 	int xGuess, yGuess;
 	String password;
 	byte[] salt;
@@ -52,7 +63,7 @@ public class SpiralScan {
 			e.printStackTrace();
 			throw new RuntimeException (e);
 		}
-		return null;
+		return NONE1;
 	}
 	
 	public int getActualRounds(){

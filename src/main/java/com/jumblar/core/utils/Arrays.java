@@ -30,5 +30,13 @@ public class Arrays {
 	public static boolean equals (byte[] arr1, byte[] arr2){
 		return java.util.Arrays.equals(arr1, arr2);
 	}
+
+	public static boolean equals(int[] none1, int[] i) {
+		return java.util.Arrays.equals(none1, i);
+	}
+	
+	public static boolean equals(int[][] n, int[][] i){
+		return java.util.Arrays.equals(n, i);
+	}
 	
 }

@@ -53,7 +53,7 @@ public class SpiralScanTwoPoint {
 			e.printStackTrace();
 			throw new RuntimeException (e);
 		}
-		return null;
+		return SpiralScan.NONE2;
 	}
 	
 	public int getActualRounds(){
