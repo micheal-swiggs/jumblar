@@ -32,16 +32,16 @@ public class PGPKeyRecord {
 
 	public static String uploadURL = "http://94.242.219.198:7080/";
 	public static String mitpgp = "http://pgp.mit.edu:11371/";
-	
+
 	public static String mitSearch (String query){
 		return mitpgp + "pks/lookup?search=" + query + "&op=index";
 	}
-	
+
 	public List<String[]> getMITEntries (String name, String email){
 		String searchStr = urlencode(name+" "+email);
 		String address = mitSearch (searchStr);
 		List<String[]> result = new ArrayList<String[]>();
-		
+
 		try{
 		Document doc = Jsoup.connect(address).get();
 		Elements elems = doc.select("pre");
@@ -55,14 +55,14 @@ public class PGPKeyRecord {
 			if (emailMatcher.find()){
 				parsedEmail = emailMatcher.group();
 			}
-			
+
 			Matcher commentMatcher = Pattern.compile ("\\(.*\\)").matcher(text);
 			String parsedComment = null;
 			if (commentMatcher.find()) parsedComment = commentMatcher.group();
 			if (parsedComment == null || parsedEmail == null)continue;
-			
+
 			String parsedUsername = text.split("\\(.*\\)")[0];
-			
+
 			parsedUsername = parsedUsername.substring(0,parsedUsername.length()-1);
 			parsedEmail = parsedEmail.substring (1, parsedEmail.length()-1);
 			parsedComment = parsedComment.substring (1, parsedComment.length()-1);
@@ -71,11 +71,11 @@ public class PGPKeyRecord {
 		}catch (Exception e){ throw new RuntimeException(e);}
 		return result;
 	}
-	
+
 	/**
 	 * Retrieves all PGP comments that share the same username, email and the comment
 	 * is deciphered/decoded without error.
-	 * 
+	 *
 	 * @param username
 	 * @param email
 	 * @param personalInfo
@@ -84,7 +84,7 @@ public class PGPKeyRecord {
 	public List<String> getPGPComments (String username, String email, String personalInfo){
 		List<String[]> possibleEntries = getMITEntries (username, email);
 		List<String> filteredComments = new ArrayList<String>();
-		
+
 		for (String[] item: possibleEntries){
 			if (!item[0].equals(username))continue;
 			if (!item[1].equals(email)) continue;
@@ -98,8 +98,8 @@ public class PGPKeyRecord {
 		}
 		return filteredComments;
 	}
-	
-	
+
+
 	public boolean uploadPGPRecord (String username, String email, String personalInfo, String comment) throws IOException{
 		String eComment = encodeComment (username, email, personalInfo, comment);
 		String queryUrl = uploadURL + "?username="+urlencode(username)+
@@ -111,13 +111,13 @@ public class PGPKeyRecord {
 			result += line + "\n";
 		}
 		return result.contains("New public keys added");
-		
+
 	}
-	
+
 	public InputStream urlToInputStream (String queryUrl) throws IOException{
 		URLConnection conn = null;
 		InputStream inputStream = null;
-		
+
 		URL url = new URL(queryUrl);
 		conn = url.openConnection();
 		HttpURLConnection httpConn = (HttpURLConnection) conn;
@@ -126,13 +126,13 @@ public class PGPKeyRecord {
 		inputStream = httpConn.getInputStream();
 		return inputStream;
 	}
-	
+
 	/**
 	 * Symmetric-encryption of the comment where the key
 	 * is derived from the username, email and personalInfo.
 	 * The personalInfo shouldn't be uploaded to the key server.
 	 * The user will need to remember the personalInfo too.
-	 * 
+	 *
 	 * @param comment
 	 */
 	protected String encodeComment(String username, String email, String personalInfo, String comment){
@@ -146,14 +146,14 @@ public class PGPKeyRecord {
 			throw new RuntimeException (e);
 		}
 	}
-	
-	protected String decodeComment (String username, String email, String personalInfo, String encodedComment) throws IOException, CryptoException{
+
+	public static String decodeComment (String username, String email, String personalInfo, String encodedComment) throws IOException, CryptoException{
 		String passphrase = username+email+personalInfo;
 		byte[] decoding = decodePGPComment (encodedComment);
 		byte[] decryption = new WeakSymmetricEncryption().decrypt(passphrase, decoding);
 		return utf8String (decryption);
 	}
-	
+
 	public static String urlencode (String arg){
 		try {
 			return URLEncoder.encode(arg, "UTF-8");
