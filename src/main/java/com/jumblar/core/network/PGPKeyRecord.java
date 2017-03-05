@@ -6,14 +6,8 @@ import static com.jumblar.core.encodings.Base64.encodePGPComment;
 import static com.jumblar.core.generators.CharacterGenerator.utf8Bytes;
 import static com.jumblar.core.generators.CharacterGenerator.utf8String;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +24,17 @@ import org.spongycastle.crypto.CryptoException;
 
 public class PGPKeyRecord {
 
-	public static String uploadURL = "http://94.242.219.198:7080/";
-	public static String mitpgp = "http://pgp.mit.edu:11371/";
+	public static String ubuntuPgp = "http://keyserver.ubuntu.com/";
 
 	public static String mitSearch (String query){
-		return mitpgp + "pks/lookup?search=" + query + "&op=index";
+		return ubuntuPgp + "pks/lookup?search=" + query + "&op=index";
+	}
+
+	PGPService pgpService;
+
+	public PGPKeyRecord(){
+
+		this.pgpService = new PGPService();
 	}
 
 	public List<String[]> getMITEntries (String name, String email){
@@ -101,30 +101,9 @@ public class PGPKeyRecord {
 
 
 	public boolean uploadPGPRecord (String username, String email, String personalInfo, String comment) throws IOException{
+
 		String eComment = encodeComment (username, email, personalInfo, comment);
-		String queryUrl = uploadURL + "?username="+urlencode(username)+
-				"&email="+urlencode(email)+"&comment="+urlencode(eComment);
-		BufferedReader rd = new BufferedReader(new InputStreamReader (urlToInputStream (queryUrl)));
-		String line = null;
-		String result = "";
-		while ((line = rd.readLine()) != null){
-			result += line + "\n";
-		}
-		return result.contains("New public keys added");
-
-	}
-
-	public InputStream urlToInputStream (String queryUrl) throws IOException{
-		URLConnection conn = null;
-		InputStream inputStream = null;
-
-		URL url = new URL(queryUrl);
-		conn = url.openConnection();
-		HttpURLConnection httpConn = (HttpURLConnection) conn;
-		httpConn.setRequestMethod("GET");
-		httpConn.connect();
-		inputStream = httpConn.getInputStream();
-		return inputStream;
+		return pgpService.uploadPGPRecord(username, eComment, email);
 	}
 
 	/**
