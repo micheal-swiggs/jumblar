@@ -41,14 +41,12 @@ public class PGPService {
             return false
         }
         String keyId = serr.toString().split("\n").find{ it.contains("ultimately")}.split(" ")[2]
-        println keyId
 
 
         String sendCmmd = "gpg --keyserver ${keyserverUrl} --send-keys ${keyId}"
         Process sendProc = sendCmmd.execute()
         sendProc.waitFor()
         exitValue = sendProc.exitValue()
-        println sendProc.text
 
         new File(batchFile).with{ f -> if (f.exists()) f.delete() }
         return exitValue == 0

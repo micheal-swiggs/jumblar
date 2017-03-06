@@ -1,5 +1,5 @@
 @GrabResolver(name='jitpack', root='https://jitpack.io/')
-@Grab('com.github.micheal-swiggs:jumblar:v0.2.0')
+@Grab('com.github.micheal-swiggs:jumblar:v0.2.1')
 @GrabExclude('org.codehaus.groovy:groovy-all')
 
 /**
@@ -8,6 +8,7 @@
  */
 import com.jumblar.core.domain.SimpleJumble;
 import com.jumblar.core.controllers.BaseController;
+import com.jumblar.core.controllers.PhraseController;
 
 println "Welcome to the Jumblar"
 
@@ -39,5 +40,10 @@ String guessCoordinate = "48.858405,2.293577";
 SimpleJumble guessJumble = bc.computeHashBase(username, email, personalInfo, password, guessCoordinate);
 byte[] guess = guessJumble.getHashBase().getHashBase()
 
+/**
+ *  This will only be true when uploading the first time.
+ */
 println Arrays.equals(original, guess)
 
+def gmailPassword = PhraseController.generatePhrase(guessJumble.getHashBase(), "myemail@gmail.com", 5)
+println "gmail-password: ${gmailPassword}"
