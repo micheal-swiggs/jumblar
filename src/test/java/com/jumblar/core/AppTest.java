@@ -73,7 +73,7 @@ public class AppTest
     }
 
     public void testBaseController() throws Exception{
-    	//if(true) throw new RuntimeException("Test Ignored");
+
     	String username = "testing-user";
     	String email = "testing-user@special.domain";
     	String personalInfo = "";
