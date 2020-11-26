@@ -1,17 +1,12 @@
 package com.jumblar.core;
 
-import java.util.Arrays;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.jumblar.core.controllers.BaseController;
-import com.jumblar.core.domain.HashBase;
 import com.jumblar.core.domain.SimpleJumble;
-import com.jumblar.core.domain.PointsReference;
 import com.jumblar.core.encodings.Base64;
-import com.jumblar.core.network.PGPKeyRecord;
 
 public class TwoPointTest extends TestCase{
 	public TwoPointTest (String testName){ super (testName);}
@@ -45,8 +40,7 @@ public class TwoPointTest extends TestCase{
 		String g2 = "-24.645764,129.596952";
 
 		SimpleJumble sj = bc.computeHashBase(username, email, personalInfo, password, g1, g2);
-		String guessHashBase = (Base64.encodeBytes(sj.getHashBase().getHashBase()));
+		String guessHashBase = (Base64.encodeBytes(sj.getHashBase().getBytes()));
 		System.out.println (guessHashBase);
-		System.out.println (sj.getHashBase().getNumGuesses());
 	}
 }

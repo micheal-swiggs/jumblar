@@ -15,7 +15,7 @@ public class SpiralScanTwoPoint {
 	byte[] vagueHash;
 	
 	int N, r, p, keyLength;
-	DoubleSpiral ds;
+	DoubleSpiral doubleSpiral;
 	
 	int actualRounds;
 	
@@ -25,7 +25,7 @@ public class SpiralScanTwoPoint {
 		this.guess2 = guess2;
 		this.password = password;
 		this.vagueHash = verifyingHash;
-		ds = new DoubleSpiral (guess1, guess2);
+		this.doubleSpiral = new DoubleSpiral (guess1, guess2);
 		this.salt = salt;
 		this.N = N;
 		this.r = r;
@@ -41,7 +41,7 @@ public class SpiralScanTwoPoint {
 		actualRounds = -1;
 		try{
 			for (int i=0; i<nRounds; i++){
-				int[][] nextPoint = ds.nextItem();
+				int[][] nextPoint = doubleSpiral.nextItem();
 				guessHash = hd.hash(nextPoint[0], nextPoint[1]);
 				guessHash = Arrays.copyOfRange(guessHash, 0, vagueHash.length);
 				if (Arrays.equals (vagueHash, guessHash)){

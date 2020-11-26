@@ -12,32 +12,15 @@ import java.io.Serializable;
  *
  */
 public class HashBase implements Serializable{
-	byte[] base;
-	int[][] actualLocations;
-	int nGuesses; //Number of spiral attempts before finding the 
-	//correct hashbase.
-	
+	final byte[] base;
+
 	public HashBase( byte[] base){
 		this.base = base;
 	}
 	
-	public byte[] getHashBase(){
+	public byte[] getBytes(){
 		return this.base;
 	}
-	
-	public void setActualLocations (int[][] val ){
-		actualLocations = val;
-	}
-	
-	public int[][] getActualLocations(){
-		return actualLocations;
-	}
-	
-	public int getNumGuesses(){
-		return nGuesses;
-	}
-	
-	public void setNumGuesses(int i){ nGuesses = i;}
 	
 	private static final long serialVersionUID = -3581639282921534022L;
 	

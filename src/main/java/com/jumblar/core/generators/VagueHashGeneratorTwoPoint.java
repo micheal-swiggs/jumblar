@@ -17,21 +17,19 @@ public class VagueHashGeneratorTwoPoint {
 
 	public static final int NBYTES = 3;
 	
-	SCryptDerivationTwoPoint hd;
-	byte[] hashArray;
+	private final byte[] hashArray;
 	
-	public VagueHashGeneratorTwoPoint(int[] pt1, int[] pt2, String password, byte[] salt,
+	private VagueHashGeneratorTwoPoint(int[] pt1, int[] pt2, String password, byte[] salt,
 			int N, int r, int p, int keyLength){
-		hd = new SCryptDerivationTwoPoint (pt1, pt2, password, salt, N,r,p,keyLength);
+		SCryptDerivationTwoPoint hd = new SCryptDerivationTwoPoint(pt1, pt2, password, salt, N, r, p, keyLength);
 		try{
 			hashArray = hd.hash();
 		} catch (GeneralSecurityException e){
-			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 	
-	public String shortenedHash(){
+	private String shortenedHash(){
 		return "#64#"+Base64.encodeBytes(Arrays.copyOfRange(hashArray, 0, NBYTES));
 	}
 	

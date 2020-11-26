@@ -12,10 +12,10 @@ Discuss <a href="https://www.facebook.com/Jumblar">Jumblar on facebook</a>.
 This section decribes how Jumblar converts & stores secret location information.  
 
 <h4>User Secrets</h4>
-Jumblar's password generation requires that a user enter a secret password and a secret location. These are combined to form what is called a 'Jumble'. 
+Jumblar's password generation requires that a user enter a secret password and a secret location. These are combined to form what is called a `HashBase`. 
 
-<h4>Jumble</h4>
-A Jumble is the 'part' from which passwords are generated. It is formed from a username, email, password and secret location. 
+<h4>HashBase</h4>
+A `HashBase` is the 'part' from which passwords are generated. It is formed the password and secret location. 
 
 <h4>Vague Hash</h4>
 The user must choose the exact same location each time that Jumblar will generate passwords. However it will be difficult for the user to zoom in and find exactly the same spot on the map. So Jumblar stores a hash of the location. Rather than storing the entire hash, Jumblar only stores a 'small' part of the hash. 

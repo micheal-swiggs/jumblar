@@ -14,8 +14,8 @@ import java.io.Serializable;
  */
 public class SimpleJumble implements Serializable{
 	private static final long serialVersionUID = -3195482909656417729L;
-	HashBase hashbase;
-	PointsReference spf;	
+	private final HashBase hashbase;
+	private final PointsReference spf;
 	
 	public SimpleJumble (HashBase hb, PointsReference spf){
 		this.hashbase = hb;

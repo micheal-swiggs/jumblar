@@ -6,15 +6,12 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.junit.Ignore;
-
 import com.jumblar.core.controllers.BaseController;
 import com.jumblar.core.controllers.PhraseController;
 import com.jumblar.core.crypto.WeakSymmetricEncryption;
 import com.jumblar.core.domain.HashBase;
 import com.jumblar.core.domain.SimpleJumble;
 import com.jumblar.core.encodings.Base64;
-import com.lambdaworks.crypto.SCryptUtil;
 import com.jumblar.core.network.PGPKeyRecord;
 import com.jumblar.core.domain.PointsReference;
 
@@ -91,15 +88,15 @@ public class AppTest
 
     	HashBase hb = bc.computeHashBase(simpleJumble.getPointsReference(),
     			password, coordinate);
-    	assertTrue(Arrays.equals(simpleJumble.getHashBase().getHashBase(),
-    			hb.getHashBase()));
+    	assertTrue(Arrays.equals(simpleJumble.getHashBase().getBytes(),
+    			hb.getBytes()));
 
 
     	/** The following is for retrieving a user pgp entry */
     	String actualHashBase = "5Oi4fog15fLJq++SslcZPRFtl1fe1sP800/r8sFmB6LpFmPUK2M+hWP1sOuKVGrosVujsGYQRIr/XNTt/Adrpg==";
     	String guessCoordinate = "48.858405,2.293577";
     	SimpleJumble sj = bc.computeHashBase(username, email, personalInfo, password, guessCoordinate);
-    	String guessHashBase = (Base64.encodeBytes(sj.getHashBase().getHashBase()));
+    	String guessHashBase = (Base64.encodeBytes(sj.getHashBase().getBytes()));
     	assertEquals (actualHashBase, guessHashBase);
     }
 
