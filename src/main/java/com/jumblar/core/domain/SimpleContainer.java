@@ -12,12 +12,12 @@ import java.io.Serializable;
  * not use this to serialize to disk. Only PointsReference should
  * be serialized to disk.
  */
-public class SimpleJumble implements Serializable{
+public class SimpleContainer implements Serializable{
 	private static final long serialVersionUID = -3195482909656417729L;
 	private final HashBase hashbase;
 	private final PointsReference spf;
 	
-	public SimpleJumble (HashBase hb, PointsReference spf){
+	public SimpleContainer(HashBase hb, PointsReference spf){
 		this.hashbase = hb;
 		this.spf = spf;
 	}

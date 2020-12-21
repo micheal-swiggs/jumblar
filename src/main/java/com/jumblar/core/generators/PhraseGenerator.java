@@ -66,7 +66,7 @@ public class PhraseGenerator {
 			digester.reset();
 			digester.update (buf);
 			buf = digester.digest (scryptHash);
-			String b = utf8String(scryptHash);
+			String b = utf8String(buf);
 			result += filterAlphaNumeric (b);
 		} 
 		Shuffler s = new Shuffler (scryptHash);
@@ -104,14 +104,40 @@ public class PhraseGenerator {
 			digester.reset();
 			digester.update(buf);
 			buf = digester.digest (scryptHash);
-			String b = utf8String (scryptHash);
+			String b = utf8String (buf);
 			result += filterAlphaNumeric (b);
 		}
 		Shuffler s = new Shuffler (scryptHash);
 		return s.shuffleString (result.substring(0, length));
-		
 	}
-	
+
+	public String randHexString (String spice, int length){
+		validateLength (length);
+		byte[] prefixBytes = utf8Bytes(spice);
+		byte[] buf1 = new byte[seed.length+prefixBytes.length+4];
+		buf1[0] = (byte) (length>>24);
+		buf1[1] = (byte) (length>>16);
+		buf1[2] = (byte) (length>>8);
+		buf1[3] = (byte) (length);
+		int i=0; for (; i<seed.length; i++){ buf1[i+4] = seed[i];}
+		for (int j=0; j<prefixBytes.length; j++){ buf1[j+i+4] = prefixBytes[j];}
+
+		final byte[] scryptHash = doSCryptHash(buf1, salt, N, r, p, keyLength);
+		String result = "";
+		MessageDigest digester = sha256Instance();
+		digester.reset();
+		byte[] buf = digester.digest(scryptHash);
+		while (result.length() < length){
+			digester.reset();
+			digester.update(buf);
+			buf = digester.digest (scryptHash);
+			result += generateHexDigit(buf);
+		}
+		Shuffler s = new Shuffler (scryptHash);
+		return s.shuffleString (result.substring(0, length));
+
+	}
+
 	protected void validateLength (int length){
 		if (length < 3){ throw new RuntimeException ("Password length must be greater than 2");}
 	}

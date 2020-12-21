@@ -5,55 +5,46 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
 import com.jumblar.core.crypto.SCryptDerivationTwoPoint;
+import com.jumblar.core.domain.HashBaseTwoPoint;
+import com.jumblar.core.domain.ScryptParams;
 
 public class SpiralScanTwoPoint {
 
-	int[] guess1;
-	int[] guess2;
 	String password;
 	byte[] salt;
 	byte[] vagueHash;
-	
-	int N, r, p, keyLength;
+
+	final ScryptParams scryptParams;
 	DoubleSpiral doubleSpiral;
 	
 	int actualRounds;
 	
 	public SpiralScanTwoPoint (int[] guess1, int[] guess2, String password,
-			byte[] verifyingHash, byte[] salt, int N, int r, int p, int keyLength){
-		this.guess1 = guess1;
-		this.guess2 = guess2;
+							   byte[] verifyingHash, byte[] salt, ScryptParams scryptParams){
 		this.password = password;
 		this.vagueHash = verifyingHash;
 		this.doubleSpiral = new DoubleSpiral (guess1, guess2);
 		this.salt = salt;
-		this.N = N;
-		this.r = r;
-		this.p = p;
-		this.keyLength = keyLength;
+		this.scryptParams = scryptParams;
 	}
 	
 	public int[][] attemptMatch (int nRounds){
 		SCryptDerivationTwoPoint hd = new SCryptDerivationTwoPoint(
-			new int[]{0,0}, new int[]{0,0}, password, salt,
-			N, r, p, keyLength);
+				password, salt,
+				scryptParams);
 		byte[] guessHash;
 		actualRounds = -1;
-		try{
-			for (int i=0; i<nRounds; i++){
-				int[][] nextPoint = doubleSpiral.nextItem();
-				guessHash = hd.hash(nextPoint[0], nextPoint[1]);
-				guessHash = Arrays.copyOfRange(guessHash, 0, vagueHash.length);
-				if (Arrays.equals (vagueHash, guessHash)){
-					actualRounds = i;
-					return nextPoint;
-				}
+		for (int i=0; i<nRounds; i++){
+			int[][] nextPoint = doubleSpiral.nextItem();
+			HashBaseTwoPoint hashBase = hd.hash(nextPoint[0], nextPoint[1]);
+			guessHash = hashBase.vagueHash();
+			if (Arrays.equals (vagueHash, guessHash)){
+				actualRounds = i;
+				System.out.println("Num rounds: " + actualRounds);
+				return nextPoint;
 			}
-		} catch (GeneralSecurityException e){
-			e.printStackTrace();
-			throw new RuntimeException (e);
 		}
-		return SpiralScan.NONE2;
+		return null;
 	}
 	
 	public int getActualRounds(){

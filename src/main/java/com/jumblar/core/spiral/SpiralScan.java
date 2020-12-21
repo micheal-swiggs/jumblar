@@ -4,13 +4,14 @@ package com.jumblar.core.spiral;
 import java.security.GeneralSecurityException;
 
 import com.jumblar.core.crypto.SCryptDerivation;
+import com.jumblar.core.domain.ScryptParams;
 import com.jumblar.core.utils.Arrays;
 
 
 public class SpiralScan {
 
-	private static final int[] NONE1 = new int[4];
-	protected static final int[][] NONE2 = new int[4][4];
+	private static final int[] NONE1 = new int[]{0};
+	protected static final int[][] NONE2 = new int[][]{{0,0}};
 	
 	public static boolean isNone(int[] i){
 		return i == NONE1;
@@ -24,29 +25,25 @@ public class SpiralScan {
 	String password;
 	byte[] salt;
 	byte[] vagueHash;
-	
-	int N, r, p, keyLength;
+
+	final ScryptParams scryptParams;
 	SingleSpiral ss;
 	
 	int actualRounds;
 	
 	public SpiralScan (int xGuess, int yGuess, String password, byte[] verifyingHash, byte[] salt,
-			int N, int r, int p, int keyLength){
+			ScryptParams scryptParams){
 		this.xGuess = xGuess;
 		this.yGuess = yGuess;
 		this.password = password;
 		this.vagueHash = verifyingHash;
 		ss = new SingleSpiral (xGuess, yGuess);
 		this.salt = salt;
-		this.N = N;
-		this.r = r;
-		this.p = p;
-		this.keyLength = keyLength;
+		this.scryptParams = scryptParams;
 	}
 	
 	public int[] attemptMatch (int nRounds){
-		SCryptDerivation hd = new SCryptDerivation (0, 0, password, salt,
-				N, r, p, keyLength);
+		SCryptDerivation hd = new SCryptDerivation (0, 0, password, salt, scryptParams);
 		byte[] guessHash;
 		actualRounds=-1;
 		try{

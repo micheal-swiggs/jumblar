@@ -142,7 +142,6 @@ public class PGPKeyRecord {
 			byte[] encryption = wse.encrypt(passphrase, utf8Bytes(comment));
 			return encodePGPComment (encryption);
 		} catch (Exception e){
-			e.printStackTrace();
 			throw new RuntimeException (e);
 		}
 	}

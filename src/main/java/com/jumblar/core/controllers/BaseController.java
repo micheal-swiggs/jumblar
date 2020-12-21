@@ -12,66 +12,84 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jumblar.core.crypto.SCryptDerivation;
+import com.jumblar.core.crypto.SCryptDerivationThreePoint;
 import com.jumblar.core.crypto.SCryptDerivationTwoPoint;
-import com.jumblar.core.domain.HashBase;
-import com.jumblar.core.domain.PointsReference;
-import com.jumblar.core.domain.SimpleJumble;
+import com.jumblar.core.domain.*;
 import com.jumblar.core.encodings.Base64;
-import com.jumblar.core.generators.VagueHashGeneratorTwoPoint;
 import com.jumblar.core.network.PGPKeyRecord;
 import com.jumblar.core.spiral.SpiralScan;
+import com.jumblar.core.spiral.SpiralScanObserver;
+import com.jumblar.core.spiral.SpiralScanThreePoint;
 import com.jumblar.core.spiral.SpiralScanTwoPoint;
 
 public class BaseController {
 
-    public SimpleJumble createNewPGPEntry(String username,
-                                          String email,
-                                          String personalInfo,
-                                          String password,
-                                          String coord1,
-                                          String coord2,
-                                          int N, int r, int p, int keyLength) {
+    public SimpleContainer createNewJumbleForThreePoints(String coord1, String coord2, String coord3, ScryptParams scryptParams) {
+        int[] c1 = toCoord(coord1);
+        int[] c2 = toCoord(coord2);
+        int[] c3 = toCoord(coord3);
+        byte[] salt = generateSalt(64);
+        HashBaseThreePoint hashBase = new SCryptDerivationThreePoint(salt, scryptParams).hash(c1, c2, c3);
+        byte[] vagueHash = hashBase.vagueHash();
+        PointsReference pointsReference = new PointsReference(salt, vagueHash, scryptParams, 3);
+        return new SimpleContainer(hashBase, pointsReference);
+    }
+
+    public SimpleContainer createNewJumble(String coord1,
+                                           String coord2,
+                                           ScryptParams scryptParams) {
+        return createNewSimpleContainer(coord1, coord2, "", scryptParams);
+    }
+
+    public SimpleContainer createNewSimpleContainer(String coord1, String coord2, String password, ScryptParams scryptParams){
+
         int[] c1 = toCoord(coord1);
         int[] c2 = toCoord(coord2);
         byte[] salt = generateSalt(64);
-        String vagueHash = VagueHashGeneratorTwoPoint.base64VagueHash(c1, c2, password, salt, N, r, p, keyLength);
-        String comment = vagueHashTag(vagueHash);
-        comment += scryptTag(N, r, p, keyLength);
-        comment += creationTimeTag(null);
-        comment += saltTag(salt);
-        comment += nPointsTag(2);
-        PGPKeyRecord pgpRecord = new PGPKeyRecord();
-        boolean result = false;
-        try {
-            result = pgpRecord.uploadPGPRecord(username, email, personalInfo, comment);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        if (result) {
-            PointsReference spf;
-            try {
-                spf = new PointsReference(salt, base64VagueHashDecode(vagueHash), username, email, personalInfo,
-                        N, r, p, keyLength, 2);
-                HashBase hb = new HashBase(new SCryptDerivationTwoPoint(c1, c2, password, spf.getSalt(),
-                        spf.getN(), spf.getR(), spf.getP(), spf.getKeyLength()).hash());
-                return new SimpleJumble(hb, spf);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
+        HashBaseTwoPoint hashBaseTwoPoint = new SCryptDerivationTwoPoint(password, salt, scryptParams).hash(c1, c2);
+        byte[] vagueHash = hashBaseTwoPoint.vagueHash();
+        PointsReference pointsReference = new PointsReference(salt, vagueHash, scryptParams, 2);
+        return new SimpleContainer(hashBaseTwoPoint, pointsReference);
     }
 
-    public SimpleJumble createNewPGPEntry(String username, String email, String personalInfo, String password, String coordinate,
-                                          int N, int r, int p, int keyLength) {
+    public HashBase computeHashBaseForThreePoints(PointsReference spf,
+                                                  String coord1,
+                                                  String coord2,
+                                                  String coord3,
+                                                  SpiralScanObserver observer) {
+        int[] c1 = toCoord(coord1);
+        int[] c2 = toCoord(coord2);
+        int[] c3 = toCoord(coord3);
+        SpiralScanThreePoint spiralScanThreePoint = new SpiralScanThreePoint(c1, c2, c3, spf.getSalt(), spf.getVagueHash(), spf.scryptParams);
+        int[][] actualCoords = spiralScanThreePoint.attemptMatch(900000000, observer);
+        if (actualCoords == null) {
+            return null;
+        }
+        return new SCryptDerivationThreePoint(spf.getSalt(), spf.scryptParams)
+                .hash(actualCoords[0], actualCoords[1], actualCoords[2]);
+
+    }
+    public HashBase computeHashBaseForTwoPoints(PointsReference spf, String coord1, String coord2) {
+        int[] c1 = toCoord(coord1);
+        int[] c2 = toCoord(coord2);
+        SpiralScanTwoPoint ds = new SpiralScanTwoPoint(c1, c2, "", spf.getVagueHash(), spf.getSalt(), spf.scryptParams);
+        int[][] actualCoordinates = ds.attemptMatch(90000000);
+        if (actualCoordinates == null) return null;
+        return new SCryptDerivationTwoPoint("", spf.getSalt(), spf.scryptParams)
+                .hash(actualCoordinates[0], actualCoordinates[1]);
+    }
+
+
+    public SimpleContainer createNewPGPEntry(String username, String email, String personalInfo, String password, String coordinate,
+                                             ScryptParams scryptParams){
         int xCoord, yCoord;
         String[] coords = coordinate.split(",");
         xCoord = (int) (new Double(coords[0]) * 1000000);
         yCoord = (int) (new Double(coords[1]) * 1000000);
         byte[] salt = generateSalt(64);
-        String vagueHash = base64VagueHash(xCoord, yCoord, password, salt, N, r, p, keyLength);
+        String vagueHash = base64VagueHash(xCoord, yCoord, password, salt, scryptParams);
         String comment = vagueHashTag(vagueHash);
-        comment += scryptTag(N, r, p, keyLength);
+        comment += scryptTag(scryptParams);
         comment += creationTimeTag(null);
         comment += saltTag(salt);
         comment += nPointsTag(1);
@@ -86,13 +104,12 @@ public class BaseController {
             PointsReference spf;
             try {
                 spf = new PointsReference(
-                        salt, base64VagueHashDecode(vagueHash), username, email, personalInfo,
-                        N, r, p, keyLength, 1);
+                        salt, base64VagueHashDecode(vagueHash),
+                        scryptParams, 1);
                 HashBase hb = new HashBase(new SCryptDerivation(xCoord, yCoord, password, salt,
-                        N, r, p, keyLength).hash());
-                return new SimpleJumble(hb, spf);
+                        scryptParams).hash());
+                return new SimpleContainer(hb, spf);
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new RuntimeException(e);
             }
 
@@ -100,34 +117,15 @@ public class BaseController {
         return null;
     }
 
-    static public HashBase computeHashBase(PointsReference spf, String password, String coordinate) {
+    static public HashBase computeHashBaseForSingleCoord(PointsReference spf, String password, String coordinate) {
         int[] coords = toCoord(coordinate);
-        SpiralScan ss = new SpiralScan(coords[0], coords[1], password, spf.getVagueHash(), spf.getSalt(),
-                spf.getN(), spf.getR(), spf.getP(), spf.getKeyLength());
+        SpiralScan ss = new SpiralScan(coords[0], coords[1], password, spf.getVagueHash(), spf.getSalt(), spf.scryptParams);
         int[] actualCoordinates = ss.attemptMatch(2000);
         if (actualCoordinates == null) return null;
         try {
-            HashBase result = new HashBase(new SCryptDerivation(actualCoordinates[0], actualCoordinates[1], password, spf.getSalt(),
-                    spf.getN(), spf.getR(), spf.getP(), spf.getKeyLength()).hash());
-            return result;
+            return new HashBase(
+                    new SCryptDerivation(actualCoordinates[0], actualCoordinates[1], password, spf.getSalt(), spf.scryptParams).hash());
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public HashBase computeHashBase(PointsReference spf, String password, String coord1, String coord2) {
-        int[] c1 = toCoord(coord1);
-        int[] c2 = toCoord(coord2);
-        SpiralScanTwoPoint ds = new SpiralScanTwoPoint(c1, c2, password, spf.getVagueHash(), spf.getSalt(),
-                spf.getN(), spf.getR(), spf.getP(), spf.getKeyLength());
-        int[][] actualCoordinates = ds.attemptMatch(4000);
-        if (actualCoordinates == null) return null;
-        try {
-            HashBase result = new HashBase(new SCryptDerivationTwoPoint(actualCoordinates[0], actualCoordinates[1], password, spf.getSalt(),
-                    spf.getN(), spf.getR(), spf.getP(), spf.getKeyLength()).hash());
-            return result;
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -135,62 +133,56 @@ public class BaseController {
     public static PointsReference convertPGPComment(String username, String email, String personalInfo, String[] comment) throws IOException {
         byte[] vHash = base64VagueHashDecode(comment[0]);
         byte[] salt = Base64.decode(comment[2]);
-        String[] scryptParams = comment[3].split(",");
-        int N = Integer.parseInt(scryptParams[0]);
-        int r = Integer.parseInt(scryptParams[1]);
-        int p = Integer.parseInt(scryptParams[2]);
-        int keyLength = Integer.parseInt(scryptParams[3]);
+        String[] scryptParamsVal = comment[3].split(",");
+        int N = Integer.parseInt(scryptParamsVal[0]);
+        int r = Integer.parseInt(scryptParamsVal[1]);
+        int p = Integer.parseInt(scryptParamsVal[2]);
+        int keyLength = Integer.parseInt(scryptParamsVal[3]);
+        ScryptParams scryptParams = new ScryptParams(N, r, p, keyLength);
         PointsReference spf = new PointsReference(
-                salt, vHash, username, email, personalInfo, N, r, p, keyLength, 2);
+                salt, vHash, scryptParams, 2);
         return spf;
     }
 
-    public SimpleJumble computeHashBase(String username, String email, String personalInfo, String password, String gCoordinate1, String gCoordinate2) throws IOException {
+    public SimpleContainer computeHashBase(String username, String email, String personalInfo, String password, String gCoordinate1, String gCoordinate2) throws IOException {
         String[] oldestEntry = urlGetOldestPGPEntry(username, email, personalInfo, 2);
         PointsReference spf = convertPGPComment(username, email, personalInfo, oldestEntry);
 
         int[] coord1 = toCoord(gCoordinate1);
         int[] coord2 = toCoord(gCoordinate2);
         SpiralScanTwoPoint ss = new SpiralScanTwoPoint(coord1, coord2, password,
-                spf.getVagueHash(), spf.getSalt(),
-                spf.getN(), spf.getR(), spf.getP(), spf.getKeyLength());
+                spf.getVagueHash(), spf.getSalt(),spf.scryptParams);
         int[][] actualCoordinates = ss.attemptMatch(90000);
         if (actualCoordinates == null) return null;
-        HashBase hb;
-        try {
-            hb = new HashBase(new SCryptDerivationTwoPoint(actualCoordinates[0],
-                    actualCoordinates[1], password, spf.getSalt(), spf.getN(),
-                    spf.getR(), spf.getP(), spf.getKeyLength()).hash());
-            return new SimpleJumble(hb, spf);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        HashBaseTwoPoint hashBase = new SCryptDerivationTwoPoint(
+                password, spf.getSalt(), spf.scryptParams).hashBase();
+        return new SimpleContainer(hashBase, spf);
 
     }
 
 
-    public SimpleJumble computeHashBase(String username, String email, String personalInfo, String password, String guessCoordinate) throws IOException {
+    public SimpleContainer computeHashBase(String username, String email, String personalInfo, String password, String guessCoordinate) throws IOException {
         String[] oldestEntry = urlGetOldestPGPEntry(username, email, personalInfo, 1);
         byte[] vHash = base64VagueHashDecode(oldestEntry[0]);
         byte[] salt = Base64.decode(oldestEntry[2]);
-        String[] scryptParams = oldestEntry[3].split(",");
-        int N = Integer.parseInt(scryptParams[0]);
-        int r = Integer.parseInt(scryptParams[1]);
-        int p = Integer.parseInt(scryptParams[2]);
-        int keyLength = Integer.parseInt(scryptParams[3]);
+        String[] scryptParamsVal = oldestEntry[3].split(",");
+        int N = Integer.parseInt(scryptParamsVal[0]);
+        int r = Integer.parseInt(scryptParamsVal[1]);
+        int p = Integer.parseInt(scryptParamsVal[2]);
+        int keyLength = Integer.parseInt(scryptParamsVal[3]);
+        ScryptParams scryptParams = new ScryptParams(N, r, p, keyLength);
         int[] coords = toCoord(guessCoordinate);
-        SpiralScan ss = new SpiralScan(coords[0], coords[1], password, vHash, salt, N, r, p, keyLength);
+        SpiralScan ss = new SpiralScan(coords[0], coords[1], password, vHash, salt, scryptParams);
         int[] actualCoordinates = ss.attemptMatch(2000);
         if (actualCoordinates == null) return null;
         PointsReference spf = new PointsReference(
-                salt, vHash, username, email, personalInfo, N, r, p, keyLength,
+                salt, vHash, scryptParams,
                 1);
         HashBase hb;
         try {
             hb = new HashBase(new SCryptDerivation(actualCoordinates[0], actualCoordinates[1], password, salt,
-                    N, r, p, keyLength).hash());
-            return new SimpleJumble(hb, spf);
+                    scryptParams).hash());
+            return new SimpleContainer(hb, spf);
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -248,8 +240,8 @@ public class BaseController {
         return "[VagueHash]" + vh + "[/VagueHash]";
     }
 
-    public String scryptTag(int N, int r, int p, int keyLength) {
-        return "[SCrypt]" + N + "," + r + "," + p + "," + keyLength + "[/SCrypt]";
+    public String scryptTag(ScryptParams scryptParams) {
+        return "[SCrypt]" + scryptParams.N + "," + scryptParams.r + "," + scryptParams.p + "," + scryptParams.keyLength + "[/SCrypt]";
     }
 
     public String creationTimeTag(Long t) {

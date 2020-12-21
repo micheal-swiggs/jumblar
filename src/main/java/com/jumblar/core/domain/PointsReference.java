@@ -1,7 +1,7 @@
 // Copyright (C) 2013 - Micheal F Swiggs.  All rights reserved.
 package com.jumblar.core.domain;
 
-import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * @author Micheal Swiggs
@@ -9,33 +9,21 @@ import java.io.Serializable;
  * password and coordinates without needing to contact
  * a PGP server.
  */
-public class PointsReference implements Serializable {
-    private static final long serialVersionUID = -2144931680542044058L;
+public class PointsReference {
 
     final byte[] salt;
     final byte[] vagueHash;
-    final int N, r, p, keyLength;
-    final String username;
-    final String email;
-    final String personalInfo;
-    int nPoints;
+    public final ScryptParams scryptParams;
+    public final int nPoints;
 
     public PointsReference(byte[] salt,
                            byte[] vHash,
-                           String username,
-                           String email,
-                           String personalInfo,
-                           int N, int r, int p, int keyLength, int nPoints) {
+                           ScryptParams scryptParams,
+                           int nPoints) {
         this.salt = salt;
         this.vagueHash = vHash;
-        this.username = username;
-        this.email = email;
-        this.personalInfo = personalInfo;
-
-        this.N = N;
-        this.r = r;
-        this.p = p;
-        this.keyLength = keyLength;
+        this.scryptParams = scryptParams;
+        this.nPoints = nPoints;
     }
 
     public byte[] getSalt() {
@@ -46,32 +34,13 @@ public class PointsReference implements Serializable {
         return vagueHash;
     }
 
-    public String getUsername() {
-        return username;
+    @Override
+    public String toString() {
+        return "PointsReference{" +
+                "salt=" + Arrays.toString(salt) +
+                ", vagueHash=" + Arrays.toString(vagueHash) +
+                ", scryptParams=" + scryptParams +
+                ", nPoints=" + nPoints +
+                '}';
     }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPersonalInfo() {
-        return personalInfo;
-    }
-
-    public int getN() {
-        return N;
-    }
-
-    public int getR() {
-        return r;
-    }
-
-    public int getP() {
-        return p;
-    }
-
-    public int getKeyLength() {
-        return keyLength;
-    }
-
 }

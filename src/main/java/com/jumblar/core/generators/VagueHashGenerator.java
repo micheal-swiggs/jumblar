@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import com.jumblar.core.crypto.SCryptDerivation;
+import com.jumblar.core.domain.ScryptParams;
 import com.jumblar.core.encodings.Base64;
 import com.jumblar.core.utils.Arrays;
 
@@ -22,27 +23,25 @@ public class VagueHashGenerator {
 	 */
 	public static final int NBYTES = 2;
 	
-	SCryptDerivation hd;
-	byte[] hashArray;
+	private final byte[] hashArray;
 	
-	public VagueHashGenerator (int x, int y, String password, byte[] salt,
-			int N, int r, int p, int keyLength){
-		hd = new SCryptDerivation (x,y, password, salt, N, r, p, keyLength);
+	private VagueHashGenerator (int x, int y, String password, byte[] salt,
+			ScryptParams scryptParams){
+		SCryptDerivation hd = new SCryptDerivation(x, y, password, salt, scryptParams);
 		try {
 			hashArray = hd.hash();
 		} catch (GeneralSecurityException e) {
-			e.printStackTrace();
 			throw new RuntimeException (e);
 		}
 	}
 	
-	public String shortenedHash(){
+	private String shortenedHash(){
 		return "#64#"+Base64.encodeBytes(Arrays.copyOfRange (hashArray, 0, NBYTES));
 	}
 	
 	public static String base64VagueHash (int x, int y, String password, byte[] salt,
-			int N, int r, int p, int keyLength){
-		return new VagueHashGenerator (x, y, password, salt, N, r, p, keyLength).shortenedHash();
+										  ScryptParams scryptParams){
+		return new VagueHashGenerator (x, y, password, salt, scryptParams).shortenedHash();
 	}
 	
 	public static byte[] base64VagueHashDecode (String vHash) throws IOException{

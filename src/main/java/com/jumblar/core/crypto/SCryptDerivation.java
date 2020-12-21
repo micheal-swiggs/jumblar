@@ -3,6 +3,7 @@ package com.jumblar.core.crypto;
 
 import java.security.GeneralSecurityException;
 
+import com.jumblar.core.domain.ScryptParams;
 import com.lambdaworks.crypto.SCrypt;
 
 import static com.jumblar.core.generators.CharacterGenerator.*;
@@ -15,11 +16,10 @@ public class SCryptDerivation {
 
     byte[] salt;
     byte[] base;
-    int N, r, p;
-    int keyLength;
+    final ScryptParams scryptParams;
 
     public SCryptDerivation(int x, int y, String password, byte[] salt,
-                            int N, int r, int p, int keyLength) {
+                            ScryptParams scryptParams) {
         byte[] pwordBytes = utf8Bytes(password);
         base = new byte[8 + pwordBytes.length];
         placePoint(x, y);
@@ -27,14 +27,11 @@ public class SCryptDerivation {
             base[i + 8] = pwordBytes[i];
         }
         this.salt = salt;
-        this.N = N;
-        this.r = r;
-        this.p = p;
-        this.keyLength = keyLength;
+        this.scryptParams = scryptParams;
     }
 
     public byte[] hash() throws GeneralSecurityException {
-        return SCrypt.scrypt(base, salt, N, r, p, keyLength);
+        return SCrypt.scrypt(base, salt, scryptParams.N, scryptParams.r, scryptParams.p, scryptParams.keyLength);
     }
 
     public byte[] hash(int x, int y) throws GeneralSecurityException {

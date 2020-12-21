@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.jumblar.core.controllers.BaseController;
-import com.jumblar.core.domain.SimpleJumble;
+import com.jumblar.core.domain.SimpleContainer;
 import com.jumblar.core.encodings.Base64;
 
 public class TwoPointTest extends TestCase{
@@ -39,7 +39,7 @@ public class TwoPointTest extends TestCase{
 		String g1 = "48.858405,2.293577";
 		String g2 = "-24.645764,129.596952";
 
-		SimpleJumble sj = bc.computeHashBase(username, email, personalInfo, password, g1, g2);
+		SimpleContainer sj = bc.computeHashBase(username, email, personalInfo, password, g1, g2);
 		String guessHashBase = (Base64.encodeBytes(sj.getHashBase().getBytes()));
 		System.out.println (guessHashBase);
 	}

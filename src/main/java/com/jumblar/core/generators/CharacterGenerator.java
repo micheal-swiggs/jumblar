@@ -35,7 +35,18 @@ public class CharacterGenerator {
 		CustomRandom s = new CustomRandom (bytes);
 		return (char)s.nextInt (zero, nine);
 	}
-	
+
+	public static String generateHexDigit (byte[] bytes){
+		CustomRandom s = new CustomRandom (bytes);
+		Integer i = s.nextInt(0, 15);
+
+		String result = Integer.toHexString(i);
+		if (result.length() > 1) {
+			throw new RuntimeException("Length should be 1, " + i + "," + result);
+		}
+		return result;
+	}
+
 	public static boolean isAlphaNumeric (char c){
 		return (c >= A && c<=Z) || (c >= a && c <= z) || ( c >= zero && c <= nine);
 	}

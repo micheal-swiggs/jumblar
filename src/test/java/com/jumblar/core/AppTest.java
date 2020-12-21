@@ -2,6 +2,8 @@ package com.jumblar.core;
 
 import java.util.Arrays;
 
+import com.jumblar.core.domain.*;
+import com.jumblar.core.spiral.SpiralScanObserver;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -9,11 +11,11 @@ import junit.framework.TestSuite;
 import com.jumblar.core.controllers.BaseController;
 import com.jumblar.core.controllers.PhraseController;
 import com.jumblar.core.crypto.WeakSymmetricEncryption;
-import com.jumblar.core.domain.HashBase;
-import com.jumblar.core.domain.SimpleJumble;
 import com.jumblar.core.encodings.Base64;
 import com.jumblar.core.network.PGPKeyRecord;
-import com.jumblar.core.domain.PointsReference;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * Unit test for simple App.
@@ -63,7 +65,7 @@ public class AppTest
         PointsReference spf = BaseController.convertPGPComment(username, email, personalInfo, ss);
         System.out.println(spf);
 
-        HashBase hb = BaseController.computeHashBase(spf, password, coordinate );
+        HashBase hb = BaseController.computeHashBaseForSingleCoord(spf, password, coordinate );
         System.out.println(hb);
 
         System.out.println(PhraseController.generatePhrase(hb, "prefix", 15));
@@ -76,29 +78,75 @@ public class AppTest
     	String personalInfo = "";
     	String password = "password";
     	String coordinate = "48.858404,2.293571"; //Corner of eiffel tower.
-    	int N = 1024;
-    	int r = 8;
-    	int p = 1;
-    	int keyLength = 64;
-    	/** The following is for user registration. */
+		ScryptParams scryptParams = new ScryptParams(1024, 8, 1, 64);
+		/** The following is for user registration. */
     	BaseController bc = new BaseController();
-    	SimpleJumble simpleJumble = bc.createNewPGPEntry(username, email, personalInfo, password, coordinate,
-    			N, r, p, keyLength);
-    	assertNotNull (simpleJumble);
+    	SimpleContainer simpleContainer = bc.createNewPGPEntry(username, email, personalInfo, password, coordinate,
+    			scryptParams);
+    	assertNotNull (simpleContainer);
 
-    	HashBase hb = bc.computeHashBase(simpleJumble.getPointsReference(),
+    	HashBase hb = BaseController.computeHashBaseForSingleCoord(simpleContainer.getPointsReference(),
     			password, coordinate);
-    	assertTrue(Arrays.equals(simpleJumble.getHashBase().getBytes(),
+    	assertTrue(Arrays.equals(simpleContainer.getHashBase().getBytes(),
     			hb.getBytes()));
 
 
     	/** The following is for retrieving a user pgp entry */
     	String actualHashBase = "5Oi4fog15fLJq++SslcZPRFtl1fe1sP800/r8sFmB6LpFmPUK2M+hWP1sOuKVGrosVujsGYQRIr/XNTt/Adrpg==";
     	String guessCoordinate = "48.858405,2.293577";
-    	SimpleJumble sj = bc.computeHashBase(username, email, personalInfo, password, guessCoordinate);
+    	SimpleContainer sj = bc.computeHashBase(username, email, personalInfo, password, guessCoordinate);
     	String guessHashBase = (Base64.encodeBytes(sj.getHashBase().getBytes()));
     	assertEquals (actualHashBase, guessHashBase);
     }
 
+    public void testCreateTwoPointSimpleContainer(){
+
+		String coordinate1 = "48.858404,2.293571"; //Corner of eiffel tower.
+		String coordinate2 = "-25.343269153592498, 131.02171142195186"; // edge of uluru.
+		BaseController baseController = new BaseController();
+		SimpleContainer newJumble = baseController.createNewJumble(coordinate1, coordinate2, new ScryptParams(2, 8, 1, 64));
+
+		byte[] originalHashBase = newJumble.getHashBase().getBytes();
+		PointsReference pointsReference = newJumble.getPointsReference();
+
+		String serialisedPointsReference = PointsReferenceSerializer.serialise(pointsReference);
+
+		String guess1 = "48.85840929275292, 2.293549542239457"; //Corner of eiffel tower.
+		String guess2 = "-25.343266153592498, 131.02171542195186"; // edge of uluru.
+
+		PointsReference deserialisedPointsReference = PointsReferenceSerializer.deserialize(serialisedPointsReference);
+		HashBase estimatedHashBase = baseController.computeHashBaseForTwoPoints(deserialisedPointsReference, guess1, guess2);
+
+		assertArrayEquals(estimatedHashBase.getBytes(), originalHashBase);
+	}
+
+	public void testCreateThreePointSimpleContainer(){
+
+		String coordinate1 = "48.858404,2.293571"; //Corner of eiffel tower.
+		String coordinate2 = "-25.343269153592498, 131.02171142195186"; // edge of uluru.
+		String coordinate3 = "60.40360442674755, 18.173187289504973"; // Forsmarks kärnkraftverk
+		BaseController baseController = new BaseController();
+		SimpleContainer newJumble = baseController.createNewJumbleForThreePoints(coordinate1, coordinate2, coordinate3, new ScryptParams(2, 1, 1, 64));
+
+		byte[] originalHashBase = newJumble.getHashBase().getBytes();
+		PointsReference pointsReference = newJumble.getPointsReference();
+
+		String serialisedPointsReference = PointsReferenceSerializer.serialise(pointsReference);
+
+		//String guess1 = "48.858404,2.293571"; //Corner of eiffel tower.
+		String guess1 = "48.858400890987504, 2.293582733234067"; //Corner of eiffel tower. actualRounds = 141420761
+
+		String guess2 = "-25.343269153592498, 131.02171142195186"; // edge of uluru.
+		//String guess2 = "-25.343271001803014, 131.02170771004674"; // edge of uluru. actualRounds = 195113
+
+		String guess3 = "60.40360442674755, 18.173187289504973"; // Forsmarks kärnkraftverk
+		//String guess3 = "60.40359544017526, 18.173186963654818"; // Forsmarks kärnkraftverk actualRounds = 26463594
+
+		PointsReference deserialisedPointsReference = PointsReferenceSerializer.deserialize(serialisedPointsReference);
+		HashBase estimatedHashBase = baseController.computeHashBaseForThreePoints(deserialisedPointsReference, guess1, guess2, guess3, new SpiralScanObserver());
+
+		assertArrayEquals(estimatedHashBase.getBytes(),originalHashBase);
+
+	}
 
 }

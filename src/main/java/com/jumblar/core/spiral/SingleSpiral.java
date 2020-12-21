@@ -9,7 +9,7 @@ package com.jumblar.core.spiral;
  */
 public class SingleSpiral {
 
-	private static final int pointSize =  2000;
+	private static final int pointSize =  10000;
 	private static final int[][] points = new int[pointSize][2];
 	private static boolean pointsInit = false;
 	
